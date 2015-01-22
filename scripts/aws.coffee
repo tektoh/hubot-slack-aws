@@ -52,12 +52,13 @@ module.exports = (robot) ->
           if name is target
             params =
               InstanceIds: [ins.InstanceId]
-              DryRun: true
+              DryRun: false
 
             ec2.startInstances params, (err, res) ->
               if err
                 msg.send "Error: #{err}"
-              msg.send "START #{target} (#{ins.InstanceId})"
+              else
+                msg.send "START #{target} (#{ins.InstanceId})"
             return
         msg.send "#{target}: not found"
 
