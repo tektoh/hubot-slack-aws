@@ -52,7 +52,7 @@ module.exports = (robot) ->
           if name is target
             params =
               InstanceIds: [ins.InstanceId]
-              #DryRun: true
+              DryRun: true
 
             ec2.startInstances params, (err, res) ->
               if err
