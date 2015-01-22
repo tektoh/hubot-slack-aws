@@ -11,12 +11,14 @@ module.exports = (robot) ->
   AWS.config.secretAccessKey = process.env.AWS_SECRET_ACCESS_KEY
   AWS.config.region = process.env.AWS_REGION
 
-  robot.respond /ls ec2( name)?$/i, (msg) ->
+  robot.respond /ec2 ls( .*)?$/i, (msg) ->
     ec2 = new AWS.EC2({apiVersion: '2014-10-01'})
     ec2.describeInstances null, (err, res)->
       if err
         msg.send "Error: #{err}"
       else
+        target = (msg.match[1] || '').trim()
+
         for data in res.Reservations
           ins = data.Instances[0]
           name = '[NoName]'
@@ -27,12 +29,12 @@ module.exports = (robot) ->
               name = tag.Value
               break
 
-          if msg.match[1]
-            if msg.match[1] in [id, name]
-              msg.send "#{ins.InstanceId} #{name} #{ins.State.Name}"
-              return
-          else
+          if !target
             msg.send "#{ins.InstanceId} #{name} #{ins.State.Name}"
+
+          else if target in [id, name]
+            msg.send "#{ins.InstanceId} #{name} #{ins.State.Name}"
+            return
 
   # robot.hear /badger/i, (msg) ->
   #   msg.send "Badgers? BADGERS? WE DON'T NEED NO STINKIN BADGERS"
