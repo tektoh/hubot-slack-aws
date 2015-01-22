@@ -1,17 +1,36 @@
 # Description:
-#   Example scripts for you to examine and try out.
+#   EC2 Controler.
 #
 # Notes:
-#   They are commented out by default, because most of them are pretty silly and
-#   wouldn't be useful and amusing enough for day to day huboting.
-#   Uncomment the ones you want to try and experiment with.
 #
-#   These are from the scripting documentation: https://github.com/github/hubot/blob/master/docs/scripting.md
 
 module.exports = (robot) ->
 
-  robot.respond /HELLO$/i, (msg) ->
-    msg.send "hello"
+  AWS = require('aws-sdk');
+  AWS.config.accessKeyId = process.env.AWS_ACCESS_KEY_ID
+  AWS.config.secretAccessKey = process.env.AWS_SECRET_ACCESS_KEY
+  AWS.config.region = process.env.AWS_REGION
+
+  robot.respond /ls ec2( name)?$/i, (msg) ->
+    ec2 = new AWS.EC2({apiVersion: '2014-10-01'})
+    ec2.describeInstances null, (err, res)->
+      if err
+        msg.send "Error: #{err}"
+      else
+        for data in res.Reservations
+          ins = data.Instances[0]
+          name = '[NoName]'
+          id = ins.InstanceId
+          for tag in ins.tags
+            if tag.Key is 'Name'
+              name = tag.Value
+              break
+          if msg.match[1]
+            if msg.match[1] in [id, name]
+              msg.send "#{ins.InstanceId} #{name} #{ins.State.Name}"
+              return
+          else
+            msg.send "#{ins.InstanceId} #{name} #{ins.State.Name}"
 
   # robot.hear /badger/i, (msg) ->
   #   msg.send "Badgers? BADGERS? WE DON'T NEED NO STINKIN BADGERS"
