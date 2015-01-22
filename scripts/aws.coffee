@@ -24,10 +24,8 @@ module.exports = (robot) ->
           name = '[NoName]'
           id = ins.InstanceId
 
-          for tag in ins.Tags
-            if tag.Key is 'Name'
-              name = tag.Value
-              break
+          for tag in ins.Tags when tag.Key is 'Name'
+            name = tag.Value
 
           if !target
             msg.send "#{ins.InstanceId} #{name} #{ins.State.Name}"
@@ -36,6 +34,31 @@ module.exports = (robot) ->
             msg.send "#{ins.InstanceId} #{name} #{ins.State.Name}"
             return
 
+  robot.respond /ec2 stop( .*)?$/i, (msg) ->
+    ec2 = new AWS.EC2({apiVersion: '2014-10-01'})
+    target = (msg.match[1] || '').trim()
+
+    if !target
+      return
+
+    ec2.describeInstances null, (err, res)->
+      if err
+        msg.send "Error: #{err}"
+      else
+        for data in res.Reservations
+          ins = data.Instances[0]
+          for tag in ins.Tags when tag.Key is 'Name'
+            name = tag.Value
+          if name is target
+            msg.send "STOP #{target}"
+            return
+            #params =
+            #  InstanceIds: [target]
+            #  DryRun: true
+
+            #ec2.stopInstances params, (err, res) ->
+            #  msg.send "STOP #{target}"
+        msg.send "#{target}: not found"
   # robot.hear /badger/i, (msg) ->
   #   msg.send "Badgers? BADGERS? WE DON'T NEED NO STINKIN BADGERS"
   #
