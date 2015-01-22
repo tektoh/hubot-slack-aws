@@ -50,8 +50,6 @@ module.exports = (robot) ->
           for tag in ins.Tags when tag.Key is 'Name'
             name = tag.Value
           if name is target
-            msg.send "START #{target} (#{ins.InstanceId})"
-            return
             params =
               InstanceIds: [target]
               DryRun: true
