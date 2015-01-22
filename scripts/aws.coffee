@@ -21,10 +21,12 @@ module.exports = (robot) ->
           ins = data.Instances[0]
           name = '[NoName]'
           id = ins.InstanceId
-          for tag in ins.tags
+
+          for tag in ins.Tags
             if tag.Key is 'Name'
               name = tag.Value
               break
+
           if msg.match[1]
             if msg.match[1] in [id, name]
               msg.send "#{ins.InstanceId} #{name} #{ins.State.Name}"
