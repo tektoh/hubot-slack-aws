@@ -50,7 +50,7 @@ module.exports = (robot) ->
           for tag in ins.Tags when tag.Key is 'Name'
             name = tag.Value
           if name is target
-            msg.send "STOP #{target}"
+            msg.send "STOP #{target} (#{ins.InstanceId})"
             return
             #params =
             #  InstanceIds: [target]
