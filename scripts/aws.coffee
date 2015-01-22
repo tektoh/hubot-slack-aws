@@ -57,8 +57,8 @@ module.exports = (robot) ->
             ec2.startInstances params, (err, res) ->
               if err
                 msg.send "Error: #{err}"
-              msg.send "START #{target}"
-          return
+              msg.send "START #{target} (#{ins.InstanceId})"
+            return
         msg.send "#{target}: not found"
 
 
@@ -85,7 +85,9 @@ module.exports = (robot) ->
             #  DryRun: true
 
             #ec2.stopInstances params, (err, res) ->
-            #  msg.send "STOP #{target}"
+            #  if err
+            #    msg.send "Error: #{err}"
+            #  msg.send "STOP #{target} (#{ins.InstanceId})"
         msg.send "#{target}: not found"
   # robot.hear /badger/i, (msg) ->
   #   msg.send "Badgers? BADGERS? WE DON'T NEED NO STINKIN BADGERS"
