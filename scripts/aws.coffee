@@ -34,6 +34,7 @@ module.exports = (robot) ->
             msg.send "#{ins.InstanceId} #{name} #{ins.State.Name}"
             return
 
+
   robot.respond /ec2 start( .*)?$/i, (msg) ->
     ec2 = new AWS.EC2({apiVersion: '2014-10-01'})
     target = (msg.match[1] || '').trim()
@@ -60,6 +61,7 @@ module.exports = (robot) ->
               else
                 msg.send "START #{target} (#{ins.InstanceId})"
             return
+
         msg.send "#{target}: not found"
 
 
@@ -79,17 +81,19 @@ module.exports = (robot) ->
           for tag in ins.Tags when tag.Key is 'Name'
             name = tag.Value
           if name is target
-            msg.send "STOP #{target} (#{ins.InstanceId})"
-            return
-            #params =
-            #  InstanceIds: [target]
-            #  DryRun: true
+            params =
+              InstanceIds: [ins.InstanceId]
+              DryRun: true
 
-            #ec2.stopInstances params, (err, res) ->
-            #  if err
-            #    msg.send "Error: #{err}"
-            #  msg.send "STOP #{target} (#{ins.InstanceId})"
+            ec2.stopInstances params, (err, res) ->
+              if err
+                msg.send "Error: #{err}"
+              else
+                msg.send "STOP #{target} (#{ins.InstanceId})"
+            return
+
         msg.send "#{target}: not found"
+
   # robot.hear /badger/i, (msg) ->
   #   msg.send "Badgers? BADGERS? WE DON'T NEED NO STINKIN BADGERS"
   #
